@@ -1,0 +1,32 @@
+{
+  	"name": "SearchWookiee",
+  	"description": "Type 'sw' + tab and you can search Wookieepedia in the Omnibox!",
+  	"version": "0.1",
+	"omnibox": { "keyword" : "sw" },
+  	"manifest_version": 2,
+	
+	"icons":{
+		"16":"img/yoda_16.png",
+		"48":"img/yoda_48.png",
+		"128":"img/yoda_128.png"
+	},
+
+	"permissions": [],
+
+	"browser_action": {
+  		"default_icon": {                    
+            "19": "img/yoda_19.png",           
+            "38": "img/yoda_38.png"            
+          },
+          "default_title": "SearchWookiee",      
+          "default_popup": "popup.html"      
+	},
+
+	"background": {
+		"persistent":false,
+  		"scripts": ["js/background.js"]
+	}
+
+}
+
+
