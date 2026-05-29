@@ -4,7 +4,7 @@
   "private": true,
   "description": "Chrome extension: Wookieepedia omnibox search (dev/test tooling only)",
   "scripts": {
-    "test": "node --test \"test/**/*.test.js\""
+    "test": "node --test --experimental-test-coverage --test-coverage-exclude=\"test/**\" --test-coverage-lines=98 --test-coverage-branches=90 --test-coverage-functions=90 \"test/**/*.test.js\""
   },
   "license": "MIT"
 }

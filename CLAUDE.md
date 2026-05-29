@@ -88,6 +88,15 @@ construction (`buildSuggestions`), and the omnibox handlers (`onInputChanged` /
 `onInputEntered` / `navigate`) using a small mock `chrome` global. Add or update
 tests in `test/background.test.js` when you change `js/background.js`.
 
+**Coverage is enforced.** `npm test` runs with Node's built-in coverage and
+fails (exit 1) if `js/background.js` falls below **98% lines / 90% branches**
+(functions are also gated at 90%). Test files are excluded from the metric via
+`--test-coverage-exclude`, so the numbers reflect real source coverage. The
+suite currently sits at 100% on all three. If you add code to `background.js`,
+add tests to keep it above the thresholds — including any browser-only guard
+blocks (see the listener-registration test, which re-`require`s the module with
+a mock `chrome` global so the registration path is exercised).
+
 The same `npm test` runs in CI on every pull request and on pushes to `main`
 via `.github/workflows/test.yml` (Node 22, no install step since there are no
 dependencies). Keep it green.
