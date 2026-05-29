@@ -89,6 +89,6 @@ There is no automated tooling. To test changes manually:
 
 ## Git / workflow
 
-- Default branch: `master`.
+- Default branch: `main`.
 - Do not create pull requests unless explicitly asked.
 - Keep changes minimal and focused; this is a tiny, self-contained codebase.
