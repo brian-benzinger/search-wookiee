@@ -18,6 +18,9 @@ test runner (`node:test`), so it needs no `npm install`.
 
 ```
 .
+├── .github/
+│   └── workflows/
+│       └── test.yml   # CI: runs `npm test` on PRs and pushes to main
 ├── manifest.json      # Extension manifest (Manifest V2) — entry point
 ├── popup.html         # Browser-action popup shown when the toolbar icon is clicked
 ├── css/
@@ -84,6 +87,10 @@ They cover URL building (`articleUrl`), XML escaping (`escapeXml`), suggestion
 construction (`buildSuggestions`), and the omnibox handlers (`onInputChanged` /
 `onInputEntered` / `navigate`) using a small mock `chrome` global. Add or update
 tests in `test/background.test.js` when you change `js/background.js`.
+
+The same `npm test` runs in CI on every pull request and on pushes to `main`
+via `.github/workflows/test.yml` (Node 22, no install step since there are no
+dependencies). Keep it green.
 
 ### Manual testing in Chrome
 
