@@ -9,8 +9,10 @@ keyword search for [Wookieepedia](https://starwars.fandom.com/), the Star Wars
 wiki. The user types `sw` in the Chrome address bar, presses space or tab to
 enter keyword mode, then types a query that is opened directly on the wiki.
 
-There is no build step, package manager, test suite, or backend. The repository
-*is* the unpacked extension — the files are loaded directly by Chrome.
+There is no build step, bundler, or backend, and no third-party dependencies.
+The repository *is* the unpacked extension — the files are loaded directly by
+Chrome. The only tooling is a unit-test suite that runs on Node's **built-in**
+test runner (`node:test`), so it needs no `npm install`.
 
 ## Repository layout
 
@@ -22,6 +24,9 @@ There is no build step, package manager, test suite, or backend. The repository
 │   └── style.css      # Styles for the popup (#hint box + fadeIn animation)
 ├── js/
 │   └── background.js  # Non-persistent background page: omnibox event handlers
+├── test/
+│   └── background.test.js  # Unit tests (node:test) for js/background.js
+├── package.json       # Dev-only: defines the `npm test` script (no deps)
 ├── img/               # Icons (yoda_*.png) referenced by the manifest
 │   ├── yoda_16.png    # toolbar / icons entry
 │   ├── yoda_19.png    # browser_action default_icon (19px)
@@ -56,9 +61,31 @@ The whole extension is wired through `manifest.json`:
   the rest with `encodeURI` (preserving `:` so namespaces like `Special:Random`
   still resolve).
 
+The logic is split into small, pure-ish functions (`articleUrl`, `escapeXml`,
+`buildSuggestions`, `navigate`, `onInputChanged`, `onInputEntered`) so it can be
+unit-tested. Two guards at the bottom of the file keep it working in both
+contexts: listener registration runs only when `chrome` is defined (the
+browser), and a `module.exports` block runs only when `module` is defined
+(Node), exporting the functions for the test suite. Keep both guards if you edit
+the file.
+
 ## Running / testing locally
 
-There is no automated tooling. To test changes manually:
+### Automated tests
+
+The unit tests live in `test/` and use Node's built-in runner — no install
+needed:
+
+```
+npm test        # or: node --test "test/**/*.test.js"
+```
+
+They cover URL building (`articleUrl`), XML escaping (`escapeXml`), suggestion
+construction (`buildSuggestions`), and the omnibox handlers (`onInputChanged` /
+`onInputEntered` / `navigate`) using a small mock `chrome` global. Add or update
+tests in `test/background.test.js` when you change `js/background.js`.
+
+### Manual testing in Chrome
 
 1. Open `chrome://extensions` in Chrome.
 2. Enable **Developer mode**.
@@ -74,8 +101,12 @@ There is no automated tooling. To test changes manually:
   favor of V3 (service workers). Do not migrate to V3 unless explicitly asked —
   it is a breaking change that affects `background`, the omnibox wiring, and
   `browser_action` (renamed to `action`).
-- **Vanilla JS only.** No frameworks, bundlers, transpilers, or dependencies.
-  Keep it dependency-free; use plain `chrome.*` APIs.
+- **Vanilla JS only.** No frameworks, bundlers, transpilers, or runtime
+  dependencies. Keep it dependency-free; use plain `chrome.*` APIs. The test
+  suite likewise uses only Node's built-in `node:test` / `node:assert` — do not
+  add a third-party test framework.
+- **Test alongside changes.** When you touch `js/background.js`, run `npm test`
+  and keep `test/background.test.js` green.
 - **Indentation** in existing files mixes tabs and spaces (e.g. `manifest.json`
   uses tabs). Match the surrounding file's style when editing.
 - Keep `version` in `manifest.json` in sync with any release you cut.

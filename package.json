@@ -1,0 +1,10 @@
+{
+  "name": "search-wookiee",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension: Wookieepedia omnibox search (dev/test tooling only)",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "license": "MIT"
+}
