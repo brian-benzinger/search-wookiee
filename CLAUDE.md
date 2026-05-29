@@ -46,11 +46,15 @@ The whole extension is wired through `manifest.json`:
 
 `js/background.js` registers two omnibox listeners:
 
-- `chrome.omnibox.onInputChanged` — fires as the user types; returns three
-  hard-coded suggestions (latest movie, a random page, the front page).
+- `chrome.omnibox.onInputChanged` — fires as the user types; returns a
+  suggestion for the live query (XML-escaped via `escapeXml()`) plus two static
+  quick links: a random page and the front page.
 - `chrome.omnibox.onInputEntered` — fires on accept; navigates the active tab
-  to `http://starwars.wikia.com/wiki/<text>` via a `navigate()` helper that
-  uses `chrome.tabs.query` + `chrome.tabs.update`.
+  to `https://starwars.fandom.com/wiki/<text>` via a `navigate()` helper that
+  uses `chrome.tabs.query` + `chrome.tabs.update`. The article title is built
+  by `articleUrl()`, which turns spaces into underscores and percent-encodes
+  the rest with `encodeURI` (preserving `:` so namespaces like `Special:Random`
+  still resolve).
 
 ## Running / testing locally
 
@@ -78,14 +82,15 @@ There is no automated tooling. To test changes manually:
 
 ## Known issues / things to be aware of
 
-- **Stale wiki URL.** `background.js` navigates to `starwars.wikia.com`, which
-  now redirects to `starwars.fandom.com`. Updating the base URL is a reasonable
-  improvement if asked.
-- **Insecure scheme.** Navigation uses `http://` rather than `https://`.
-- The `onInputChanged` suggestions are hard-coded (e.g. "Star_wars_episode_7")
-  and not derived from the user's query.
-- The query text is concatenated into the URL without encoding; consider
-  `encodeURIComponent` if touching that code.
+- The two quick-link suggestions (random page, front page) are static by
+  design; only the first suggestion reflects the typed query.
+- Omnibox suggestion descriptions are parsed as XML, so any dynamic text must
+  pass through `escapeXml()` before being interpolated. Keep that escaping if
+  you add more dynamic suggestions.
+
+Previously-known issues, now fixed in `js/background.js`: the base URL points at
+`https://starwars.fandom.com` (was the stale, insecure `http://starwars.wikia.com`),
+and article titles are encoded via `articleUrl()` rather than concatenated raw.
 
 ## Git / workflow
 
