@@ -160,3 +160,26 @@ test("onInputEntered: namespace input keeps its colon", () => {
     assert.equal(calls.update[0].updateInfo.url, BASE + "Special:Random");
   });
 });
+
+// --- Listener registration (browser-context guard) ---
+
+test("registers omnibox listeners when a chrome.omnibox global is present", () => {
+  const added = {};
+  global.chrome = {
+    omnibox: {
+      onInputChanged: { addListener(fn) { added.changed = fn; } },
+      onInputEntered: { addListener(fn) { added.entered = fn; } }
+    }
+  };
+  // Re-evaluate the module so its registration guard runs with chrome defined.
+  const path = require.resolve("../js/background.js");
+  delete require.cache[path];
+  try {
+    const fresh = require(path);
+    assert.equal(added.changed, fresh.onInputChanged);
+    assert.equal(added.entered, fresh.onInputEntered);
+  } finally {
+    delete global.chrome;
+    delete require.cache[path];
+  }
+});
