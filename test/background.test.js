@@ -90,9 +90,9 @@ test("buildSuggestions: non-empty query prepends a query suggestion", () => {
   assert.equal(out.length, 3);
   assert.equal(out[0].content, "yoda");
   assert.match(out[0].description, /<match>yoda<\/match>/);
-  // quick links remain as the last two entries
-  assert.equal(out[1].content, "Special:Random");
-  assert.equal(out[2].content, "Main_Page");
+  // quick links remain as the last two entries — check full shape, not just content
+  assert.deepEqual(out[1], { content: "Special:Random", description: "A Random Page" });
+  assert.deepEqual(out[2], { content: "Main_Page", description: "Front Page" });
 });
 
 test("buildSuggestions: query content is trimmed", () => {
@@ -115,6 +115,17 @@ test("onInputChanged: passes built suggestions to the suggest callback", () => {
   assert.match(received[0].description, /<match>luke<\/match>/);
   assert.equal(received[1].content, "Special:Random");
   assert.equal(received[2].content, "Main_Page");
+});
+
+test("onInputChanged: empty query passes only the two quick links to suggest", () => {
+  // Chrome fires onInputChanged with "" when the user enters keyword mode
+  // without typing anything yet; verify the handler passes through correctly.
+  let received;
+  bg.onInputChanged("", (s) => { received = s; });
+  assert.deepEqual(received, [
+    { content: "Special:Random", description: "A Random Page" },
+    { content: "Main_Page", description: "Front Page" }
+  ]);
 });
 
 // --- Navigation paths (require a mocked chrome global) ---
