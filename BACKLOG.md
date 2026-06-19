@@ -1,0 +1,7 @@
+# Backlog
+
+## CI/CD
+
+- [ ] Pin `actions/checkout` and `actions/setup-node` to full commit SHAs (rubric #4: action pinning) — Dependabot will propose the PRs once `.github/dependabot.yml` is merged
+- [ ] Add `npm audit` step to CI to surface any future dependency vulnerabilities (rubric #6: security scanning) — currently a no-op since there are no runtime deps, but useful as deps are added
+- [ ] Enforce branch protection on `main` requiring the `test` check to pass before merge (rubric #8: required checks) — needs repo-admin rights to configure
