@@ -109,7 +109,12 @@ test("buildSuggestions: query description is XML-escaped", () => {
 test("onInputChanged: passes built suggestions to the suggest callback", () => {
   let received;
   bg.onInputChanged("luke", (s) => { received = s; });
-  assert.deepEqual(received, bg.buildSuggestions("luke"));
+  // Check actual content so a regression in buildSuggestions is caught here too.
+  assert.equal(received.length, 3);
+  assert.equal(received[0].content, "luke");
+  assert.match(received[0].description, /<match>luke<\/match>/);
+  assert.equal(received[1].content, "Special:Random");
+  assert.equal(received[2].content, "Main_Page");
 });
 
 // --- Navigation paths (require a mocked chrome global) ---
@@ -158,6 +163,20 @@ test("onInputEntered: namespace input keeps its colon", () => {
   withMockChrome(1, (calls) => {
     bg.onInputEntered("Special:Random");
     assert.equal(calls.update[0].updateInfo.url, BASE + "Special:Random");
+  });
+});
+
+test("onInputEntered: empty input navigates to the wiki base URL", () => {
+  withMockChrome(3, (calls) => {
+    bg.onInputEntered("");
+    assert.equal(calls.update[0].updateInfo.url, BASE);
+  });
+});
+
+test("onInputEntered: whitespace-only input navigates to the wiki base URL", () => {
+  withMockChrome(4, (calls) => {
+    bg.onInputEntered("   ");
+    assert.equal(calls.update[0].updateInfo.url, BASE);
   });
 });
 
