@@ -88,8 +88,10 @@ test("buildSuggestions: whitespace-only query is treated as empty", () => {
 test("buildSuggestions: non-empty query prepends a query suggestion", () => {
   const out = bg.buildSuggestions("yoda");
   assert.equal(out.length, 3);
-  assert.equal(out[0].content, "yoda");
-  assert.match(out[0].description, /<match>yoda<\/match>/);
+  assert.deepEqual(out[0], {
+    content: "yoda",
+    description: "Go to <match>yoda</match> on Wookieepedia"
+  });
   // quick links remain as the last two entries — check full shape, not just content
   assert.deepEqual(out[1], { content: "Special:Random", description: "A Random Page" });
   assert.deepEqual(out[2], { content: "Main_Page", description: "Front Page" });
@@ -101,18 +103,22 @@ test("buildSuggestions: query content is trimmed", () => {
 
 test("buildSuggestions: query description is XML-escaped", () => {
   const out = bg.buildSuggestions('Tom & "Jerry" <3');
-  assert.match(out[0].description, /Tom &amp; &quot;Jerry&quot; &lt;3/);
-  // content keeps the raw (trimmed) query
-  assert.equal(out[0].content, 'Tom & "Jerry" <3');
+  // Full description asserted so a template change around the escaped text is caught too.
+  assert.deepEqual(out[0], {
+    content: 'Tom & "Jerry" <3',
+    description: 'Go to <match>Tom &amp; &quot;Jerry&quot; &lt;3</match> on Wookieepedia'
+  });
 });
 
 test("onInputChanged: passes built suggestions to the suggest callback", () => {
   let received;
   bg.onInputChanged("luke", (s) => { received = s; });
-  // Check actual content so a regression in buildSuggestions is caught here too.
+  // Check full shape so a regression in buildSuggestions template is caught here too.
   assert.equal(received.length, 3);
-  assert.equal(received[0].content, "luke");
-  assert.match(received[0].description, /<match>luke<\/match>/);
+  assert.deepEqual(received[0], {
+    content: "luke",
+    description: "Go to <match>luke</match> on Wookieepedia"
+  });
   assert.equal(received[1].content, "Special:Random");
   assert.equal(received[2].content, "Main_Page");
 });
