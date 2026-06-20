@@ -101,7 +101,10 @@ test("buildSuggestions: non-empty query prepends a query suggestion", () => {
 });
 
 test("buildSuggestions: query content is trimmed", () => {
-  assert.equal(bg.buildSuggestions("  yoda  ")[0].content, "yoda");
+  assert.deepEqual(bg.buildSuggestions("  yoda  ")[0], {
+    content: "yoda",
+    description: "Go to <match>yoda</match> on Wookieepedia"
+  });
 });
 
 test("buildSuggestions: query description is XML-escaped", () => {
@@ -122,8 +125,8 @@ test("onInputChanged: passes built suggestions to the suggest callback", () => {
     content: "luke",
     description: "Go to <match>luke</match> on Wookieepedia"
   });
-  assert.equal(received[1].content, "Special:Random");
-  assert.equal(received[2].content, "Main_Page");
+  assert.deepEqual(received[1], { content: "Special:Random", description: "A Random Page" });
+  assert.deepEqual(received[2], { content: "Main_Page", description: "Front Page" });
 });
 
 test("onInputChanged: empty query passes only the two quick links to suggest", () => {
