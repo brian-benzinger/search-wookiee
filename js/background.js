@@ -1,5 +1,5 @@
 // Base URL for Wookieepedia article pages.
-var WIKI_BASE = "https://starwars.fandom.com/wiki/";
+const WIKI_BASE = "https://starwars.fandom.com/wiki/";
 
 // Build a wiki article URL from arbitrary input. Spaces become underscores
 // (the wiki title convention) and the rest is percent-encoded with encodeURI,
@@ -9,19 +9,16 @@ function articleUrl(text) {
 }
 
 // Escape text for an omnibox suggestion description, which Chrome parses as XML.
+const XML_ESCAPE = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" };
 function escapeXml(text) {
-  return text.replace(/&/g, "&amp;")
-             .replace(/</g, "&lt;")
-             .replace(/>/g, "&gt;")
-             .replace(/"/g, "&quot;")
-             .replace(/'/g, "&apos;");
+  return text.replace(/[&<>"']/g, c => XML_ESCAPE[c]);
 }
 
 // Build the omnibox suggestion list for the current query. The first entry
 // reflects the live query (when non-empty); the rest are static quick links.
 function buildSuggestions(text) {
-  var suggestions = [];
-  var query = text.trim();
+  const suggestions = [];
+  const query = text.trim();
   if (query) {
     suggestions.push({
       content: query,
