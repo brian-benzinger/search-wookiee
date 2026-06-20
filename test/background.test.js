@@ -82,7 +82,10 @@ test("buildSuggestions: empty query returns only the two quick links", () => {
 });
 
 test("buildSuggestions: whitespace-only query is treated as empty", () => {
-  assert.equal(bg.buildSuggestions("   ").length, 2);
+  assert.deepEqual(bg.buildSuggestions("   "), [
+    { content: "Special:Random", description: "A Random Page" },
+    { content: "Main_Page", description: "Front Page" }
+  ]);
 });
 
 test("buildSuggestions: non-empty query prepends a query suggestion", () => {
@@ -194,6 +197,13 @@ test("onInputEntered: whitespace-only input navigates to the wiki base URL", () 
   withMockChrome(4, (calls) => {
     bg.onInputEntered("   ");
     assert.equal(calls.update[0].updateInfo.url, BASE);
+  });
+});
+
+test("onInputEntered: leading/trailing whitespace is trimmed from the article URL", () => {
+  withMockChrome(5, (calls) => {
+    bg.onInputEntered("  Luke Skywalker  ");
+    assert.equal(calls.update[0].updateInfo.url, BASE + "Luke_Skywalker");
   });
 });
 
