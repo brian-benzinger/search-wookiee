@@ -123,6 +123,15 @@ test("buildSuggestions: query description is XML-escaped", () => {
   });
 });
 
+test("buildSuggestions: escapes apostrophes and '>' in the description", () => {
+  // Apostrophes are common in Star Wars titles (e.g. "Vader's Fist") and '>'
+  // is the one XML entity not covered by the sibling test above.
+  assert.deepEqual(bg.buildSuggestions("Vader's Fist > Others")[0], {
+    content: "Vader's Fist > Others",
+    description: "Go to <match>Vader&apos;s Fist &gt; Others</match> on Wookieepedia"
+  });
+});
+
 test("onInputChanged: passes built suggestions to the suggest callback", () => {
   let received;
   bg.onInputChanged("luke", (s) => { received = s; });
