@@ -40,6 +40,13 @@ test("articleUrl: preserves '/' for subpages", () => {
                BASE + "Star_Wars/Legends");
 });
 
+test("articleUrl: preserves '#' so section anchors resolve", () => {
+  assert.equal(bg.articleUrl("Luke Skywalker#Early life"),
+               BASE + "Luke_Skywalker#Early_life");
+  assert.equal(bg.articleUrl("Anakin Skywalker#Dark side"),
+               BASE + "Anakin_Skywalker#Dark_side");
+});
+
 test("articleUrl: percent-encodes unsafe characters", () => {
   assert.equal(bg.articleUrl('say "hi"'), BASE + "say_%22hi%22");
   // non-ASCII is UTF-8 percent-encoded
