@@ -32,7 +32,7 @@ function buildSuggestions(text) {
 
 // Open the given URL in the active tab.
 function navigate(url) {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+  chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     chrome.tabs.update(tabs[0].id, {url: url});
   });
 }
@@ -59,12 +59,12 @@ if (typeof chrome !== "undefined" && chrome.omnibox) {
 // where `module` is undefined.
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
-    WIKI_BASE: WIKI_BASE,
-    articleUrl: articleUrl,
-    escapeXml: escapeXml,
-    buildSuggestions: buildSuggestions,
-    navigate: navigate,
-    onInputChanged: onInputChanged,
-    onInputEntered: onInputEntered
+    WIKI_BASE,
+    articleUrl,
+    escapeXml,
+    buildSuggestions,
+    navigate,
+    onInputChanged,
+    onInputEntered
   };
 }
