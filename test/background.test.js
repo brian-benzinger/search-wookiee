@@ -156,6 +156,21 @@ test("onInputChanged: empty query passes only the two quick links to suggest", (
   ]);
 });
 
+test("onInputChanged: content stays unescaped while description is XML-escaped", () => {
+  // Apostrophes appear in many Star Wars titles ("Jabba's Palace", "Vader's Fist").
+  // 'content' is used as the omnibox value / URL path — it must NOT be XML-escaped.
+  // 'description' is parsed as XML by Chrome — special chars MUST be escaped.
+  // This guards against a regression where escapeXml is accidentally applied to
+  // the text inside onInputChanged before it reaches buildSuggestions, which the
+  // plain-text tests above ("luke", "") would not catch.
+  let received;
+  bg.onInputChanged("Jabba's Palace", (s) => { received = s; });
+  assert.deepEqual(received[0], {
+    content: "Jabba's Palace",
+    description: "Go to <match>Jabba&apos;s Palace</match> on Wookieepedia"
+  });
+});
+
 // --- Navigation paths (require a mocked chrome global) ---
 
 function withMockChrome(activeTabId, fn) {
