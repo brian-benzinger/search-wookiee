@@ -226,6 +226,17 @@ test("onInputEntered: leading/trailing whitespace is trimmed from the article UR
   });
 });
 
+test("onInputEntered: passes '&' to the URL as-is (not XML-escaped to '&amp;')", () => {
+  // encodeURI preserves '&' as a URI reserved character, so the URL gets a
+  // literal '&'. More importantly, this guards against accidentally running
+  // escapeXml on the text before articleUrl — that would produce '&amp;' in
+  // the URL, silently navigating to the wrong article.
+  withMockChrome(9, (calls) => {
+    bg.onInputEntered("Han & Leia");
+    assert.equal(calls.update[0].updateInfo.url, BASE + "Han_&_Leia");
+  });
+});
+
 // --- Listener registration (browser-context guard) ---
 
 test("registers omnibox listeners when a chrome.omnibox global is present", () => {
