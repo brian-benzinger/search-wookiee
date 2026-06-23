@@ -260,6 +260,16 @@ test("onInputEntered: passes '&' to the URL as-is (not XML-escaped to '&amp;')",
   });
 });
 
+test("onInputEntered: angle brackets are percent-encoded in the URL, not XML-escaped", () => {
+  // '<' and '>' must appear as '%3C'/'%3E' in the URL — never as '&lt;'/'&gt;'.
+  // Guards against accidentally running escapeXml before articleUrl, which
+  // would turn '<tag>' into '&lt;tag&gt;' and silently navigate to the wrong article.
+  withMockChrome(10, (calls) => {
+    bg.onInputEntered("Anakin <Dark Side>");
+    assert.equal(calls.update[0].updateInfo.url, BASE + "Anakin_%3CDark_Side%3E");
+  });
+});
+
 // --- Listener registration (browser-context guard) ---
 
 test("registers omnibox listeners when a chrome.omnibox global is present", () => {
