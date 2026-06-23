@@ -79,6 +79,14 @@ test("escapeXml: leaves plain text unchanged", () => {
   assert.equal(bg.escapeXml("Obi-Wan Kenobi"), "Obi-Wan Kenobi");
 });
 
+test("escapeXml: re-escapes already-escaped sequences (treats input as raw text)", () => {
+  // A user can type literal entity text like '&amp;' or '&lt;tag&gt;' in the
+  // omnibox. The description must show exactly what they typed, so '&' must be
+  // escaped again — not recognised as a safe entity and passed through.
+  assert.equal(bg.escapeXml("&amp;"), "&amp;amp;");
+  assert.equal(bg.escapeXml("&lt;tag&gt;"), "&amp;lt;tag&amp;gt;");
+});
+
 test("buildSuggestions: empty query returns only the two quick links", () => {
   const out = bg.buildSuggestions("");
   assert.equal(out.length, 2);
