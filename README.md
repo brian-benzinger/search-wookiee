@@ -1,5 +1,7 @@
 # search-wookiee
 
+[![CI](https://github.com/brian-benzinger/search-wookiee/actions/workflows/test.yml/badge.svg)](https://github.com/brian-benzinger/search-wookiee/actions/workflows/test.yml)
+
 Chrome extension that adds a Wookieepedia omnibox keyword — type `sw` in the address bar to search the Star Wars wiki instantly.
 
 ## Installation
@@ -27,7 +29,7 @@ No dependencies to install. Run the test suite with Node's built-in runner:
 npm test
 ```
 
-Tests live in `test/background.test.js` and cover URL building, XML escaping, suggestion construction, and the omnibox event handlers. Coverage is gated at 98% lines / 90% branches.
+Tests live in `test/background.test.js` and cover URL building, XML escaping, suggestion construction, and the omnibox event handlers. Coverage is gated at 98% lines / 90% branches / 90% functions.
 
 After editing `js/background.js`, reload the extension on `chrome://extensions` to pick up the changes.
 
