@@ -140,6 +140,17 @@ test("buildSuggestions: escapes apostrophes and '>' in the description", () => {
   });
 });
 
+test("buildSuggestions: all five XML special characters in one query", () => {
+  // Guards the single-pass regex in escapeXml: a query containing &, <, >, ", '
+  // all at once must be escaped correctly in 'description' while 'content' keeps
+  // the raw characters (Chrome uses 'content' as the URL path, not XML).
+  const query = "a & <b> 'c' \"d\"";
+  assert.deepEqual(bg.buildSuggestions(query)[0], {
+    content: query,
+    description: "Go to <match>a &amp; &lt;b&gt; &apos;c&apos; &quot;d&quot;</match> on Wookieepedia"
+  });
+});
+
 test("onInputChanged: passes built suggestions to the suggest callback", () => {
   let received;
   bg.onInputChanged("luke", (s) => { received = s; });
@@ -158,6 +169,18 @@ test("onInputChanged: empty query passes only the two quick links to suggest", (
   // without typing anything yet; verify the handler passes through correctly.
   let received;
   bg.onInputChanged("", (s) => { received = s; });
+  assert.deepEqual(received, [
+    { content: "Special:Random", description: "A Random Page" },
+    { content: "Main_Page", description: "Front Page" }
+  ]);
+});
+
+test("onInputChanged: whitespace-only input passes only the two quick links to suggest", () => {
+  // Chrome can call onInputChanged with whitespace-only text (e.g. the user
+  // types spaces after the 'sw' keyword). The handler should treat it like an
+  // empty query and show only the static quick links, not a suggestion for "   ".
+  let received;
+  bg.onInputChanged("   ", (s) => { received = s; });
   assert.deepEqual(received, [
     { content: "Special:Random", description: "A Random Page" },
     { content: "Main_Page", description: "Front Page" }
