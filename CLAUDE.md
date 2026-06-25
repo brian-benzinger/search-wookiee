@@ -19,6 +19,7 @@ test runner (`node:test`), so it needs no `npm install`.
 ```
 .
 ├── .github/
+│   ├── dependabot.yml # Automated weekly updates for GitHub Actions and npm packages
 │   └── workflows/
 │       └── test.yml   # CI: runs `npm test` on PRs and pushes to main
 ├── manifest.json      # Extension manifest (Manifest V2) — entry point
