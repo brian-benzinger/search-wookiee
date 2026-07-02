@@ -53,6 +53,13 @@ test("articleUrl: percent-encodes unsafe characters", () => {
   assert.equal(bg.articleUrl("Café"), BASE + "Caf%C3%A9");
 });
 
+test("articleUrl: preserves apostrophes unencoded (encodeURI does not encode them)", () => {
+  // Apostrophes are common in Star Wars titles ("Jabba's Palace", "Mando'a").
+  // encodeURI leaves "'" in the unreserved set, so they remain literal in the URL.
+  assert.equal(bg.articleUrl("Jabba's Palace"), BASE + "Jabba's_Palace");
+  assert.equal(bg.articleUrl("Mando'a"), BASE + "Mando'a");
+});
+
 test("articleUrl: leaves already-underscored titles intact", () => {
   assert.equal(bg.articleUrl("Darth_Vader"), BASE + "Darth_Vader");
 });
@@ -290,6 +297,17 @@ test("onInputEntered: angle brackets are percent-encoded in the URL, not XML-esc
   withMockChrome(10, (calls) => {
     bg.onInputEntered("Anakin <Dark Side>");
     assert.equal(calls.update[0].updateInfo.url, BASE + "Anakin_%3CDark_Side%3E");
+  });
+});
+
+test("onInputEntered: apostrophes in article titles are preserved as-is (not XML-escaped to '&apos;')", () => {
+  // encodeURI leaves "'" in the unreserved set, so apostrophes remain literal in
+  // the URL. Guards against accidentally running escapeXml before articleUrl —
+  // that would turn "Jabba's" into "Jabba&apos;s" and silently navigate to the
+  // wrong article.
+  withMockChrome(11, (calls) => {
+    bg.onInputEntered("Jabba's Palace");
+    assert.equal(calls.update[0].updateInfo.url, BASE + "Jabba's_Palace");
   });
 });
 
